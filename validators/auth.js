@@ -3,27 +3,76 @@ const { check, validationResult } = require("express-validator");
 exports.validateSignupRequest = [
   check("fullName").notEmpty().withMessage("Please enter your name"),
   check("password")
-    .isLength({ min: 8 })
-    .withMessage("Password must be atleast 8 characters long"),
+  .notEmpty()
+  .withMessage('password is required')
+  .isLength({ min: 8 })
+  .withMessage('password must be 8 characters'),
   check("rollNumber").notEmpty().withMessage("Roll number id required"),
   check("contact").notEmpty().withMessage("Contact number is required"),
 ];
 
 exports.validateMailRequest = [
-  check("email").isEmail().withMessage("Enter email")
+  check("email")
+  .notEmpty()
+  .withMessage('Email is required')
+  .isEmail()
+  .withMessage("Invalid Email")
 ]
 
 exports.validateOtpRequest = [
-  check("email").isEmail().withMessage("Enter email"),
-  check("otp").notEmpty().withMessage("Enter OTP")
+  check("email")
+  .notEmpty()
+  .withMessage('Email is required')
+  .isEmail()
+  .withMessage("Invalid Email"),
+  check("otp")
+  .notEmpty()
+  .withMessage("OTP is required")
+  .isLength({ min: 4, max:4 })
+  .withMessage("Invalid OTP")
 ]
 
 exports.validateSigninRequest = [
-  check("email").isEmail().withMessage("Enter email"),
+  check("email")
+  .notEmpty()
+  .withMessage('Email is required')
+  .isEmail()
+  .withMessage("Invalid Email"),
   check("password")
-    .isLength({ min: 8 })
-    .withMessage("Password must be atleast 8 character long"),
+  .notEmpty()
+  .withMessage('password is required')
+  .isLength({ min: 8 })
+  .withMessage('password must be 8 characters')
 ];
+
+exports.validateLoginWithPassword = [
+  check("email")
+  .notEmpty()
+  .withMessage('Email is required')
+  .isEmail()
+  .withMessage("Invalid Email"),
+  check("password")
+  .notEmpty()
+  .withMessage('password is required')
+  .isLength({ min: 8 })
+  .withMessage('password must be 8 characters'),
+  check("remember")
+  .notEmpty()
+  .withMessage("Rembeber is required")
+  .isBoolean()
+  .withMessage("Remember must be a Boolean")
+]
+
+exports.validateLoginWithLinkedIn = [
+  check("accessToken")
+  .notEmpty()
+  .withMessage("AccessToken is Required"),
+  check("remember")
+  .notEmpty()
+  .withMessage("Rembeber is required")
+  .isBoolean()
+  .withMessage("Remember must be a Boolean")
+]
 
 exports.isRequestValidated = (req, res, next) => {
   const errors = validationResult(req);

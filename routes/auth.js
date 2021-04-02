@@ -1,22 +1,63 @@
 const express = require("express");
 const router = express.Router();
-const { signup, signin, mailOtp, verifyOtp, isIiitian } = require("../controllers/auth");
+const {
+  mailOtp,
+  verifyOtp,
+  isIiitian,
+  loginWithPassword,
+  isAuthenticated,
+  logout,
+  loginWithLinkedIn,
+} = require("../controllers/auth");
 const {
   validateMailRequest,
   validateOtpRequest,
-  validateSignupRequest,
   isRequestValidated,
-  validateSigninRequest,
+  validateLoginWithPassword,
+  validateLoginWithLinkedIn,
 } = require("../validators/auth");
+const { handleError } = require("../middlewares/index");
+router.post(
+  "/mailotp",
+  validateMailRequest,
+  isRequestValidated,
+  mailOtp,
+  handleError
+);
 
-router.post("/mailotp", validateMailRequest, isRequestValidated, mailOtp);
+router.post(
+  "/verifyotp",
+  validateOtpRequest,
+  isRequestValidated,
+  verifyOtp,
+  handleError
+);
 
-router.post("/verifyotp", validateOtpRequest, isRequestValidated, verifyOtp);
+router.post(
+  "/verifyiiitianemail",
+  validateMailRequest,
+  isRequestValidated,
+  isIiitian,
+  mailOtp,
+  handleError
+);
 
-router.post("/verifyiiitianemail", validateMailRequest, isRequestValidated, isIiitian, mailOtp)
+router.post(
+  "/loginwithpassword",
+  validateLoginWithPassword,
+  isRequestValidated,
+  loginWithPassword,
+  handleError
+);
 
-router.post("/signup", validateSignupRequest, isRequestValidated, signup);
+router.post("/logout", isAuthenticated, logout, handleError);
 
-router.post("/signin", validateSigninRequest, isRequestValidated, signin);
+router.post(
+  "/loginwithlinkedin",
+  validateLoginWithLinkedIn,
+  isRequestValidated,
+  loginWithLinkedIn,
+  handleError
+);
 
 module.exports = router;
