@@ -8,6 +8,8 @@ const {
   isAuthenticated,
   logout,
   loginWithLinkedIn,
+  verifyBothOtp,
+  signupWithPassword
 } = require("../controllers/auth");
 const {
   validateMailRequest,
@@ -15,6 +17,7 @@ const {
   isRequestValidated,
   validateLoginWithPassword,
   validateLoginWithLinkedIn,
+  validateSignupWithPassword,
 } = require("../validators/auth");
 const { handleError } = require("../middlewares/index");
 router.post(
@@ -57,6 +60,16 @@ router.post(
   validateLoginWithLinkedIn,
   isRequestValidated,
   loginWithLinkedIn,
+  handleError
+);
+
+router.post(
+  "/signupwithpassword",
+  validateSignupWithPassword,
+  isRequestValidated,
+  verifyBothOtp,
+  handleError,
+  signupWithPassword,
   handleError
 );
 

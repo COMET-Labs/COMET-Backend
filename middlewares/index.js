@@ -17,5 +17,6 @@ exports.handleError = (err, req, res, next) => {
       message: err.message || 'Something went wrong, please try again.'
     });
   }
+  next();
 }
 

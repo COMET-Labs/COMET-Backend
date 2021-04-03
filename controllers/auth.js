@@ -257,3 +257,114 @@ exports.loginWithLinkedIn = async (req, res, next) => {
     next({ status: 401 });
   }
 };
+
+exports.verifyBothOtp = (req, res, next) => {
+  try {
+    var params = {
+      TableName: "otp",
+      Key: {
+        email_id: req.body.personalEmail,
+      },
+    };
+    docClient.get(params, function (err, data) {
+      if (err) {
+        res.status(200).json({
+          error: "Expired or Incorrect OTP",
+        });
+      } else {
+        if (data && data.Item && data.Item.otp === req.body.personalEmailOtp) {
+
+
+            var instituteEmailParams = {
+              TableName: "otp",
+              Key: {
+                email_id: req.body.instituteEmail,
+              },
+            };
+            docClient.get(instituteEmailParams, function (err, data) {
+              if (err) {
+                res.status(200).json({
+                  error: "Expired or Incorrect OTP",
+                });
+              } else {
+                if (data && data.Item && data.Item.otp === req.body.instituteEmailOtp) {
+                  res.status(200).json({
+                    success: "OTP is Correct",
+                  });
+                } else {
+                  res.status(200).json({
+                    error: "Expired or Incorrect OTP",
+                  });
+                }
+              }
+            });          
+          
+
+          res.status(200).json({
+            success: "OTP is Correct",
+          });
+        } else {
+          res.status(200).json({
+            error: "Expired or Incorrect OTP",
+          });
+        }
+      }
+    });
+  } catch (err) {
+    next({ status: 401 });
+  }
+};
+
+exports.signupWithPassword = (req, res) => {
+  try {
+    let params = {
+      TableName: "Users",
+      Key: {
+        personalEmail: req.body.personalEmail,
+      },
+    };
+    docClient.get(params, function (err, data) {
+      if (err) {
+        res.status(200).json({
+          error: "Some error occured",
+        });
+      } else {
+        if (data && data.Item) {
+          res.status(200).json({
+            error: "You already have an account. Kindly Login",
+          });
+        } else {
+
+
+          var createParams = {
+            TableName:Users,
+            Item:{
+                "fullName": req.body.fullName,
+                "hashPassword": req.body.password,
+                "rollNumber": req.body.rollNumber,
+                "contact": req.body.contact,
+                "accessToken": req.body.accessToken,
+                "personalEmail": req.body.personalEmail,
+                "instituteEmail": req.body.instituteEmail
+            }
+        };
+        docClient.put(createParams, function(err, data) {
+            if (err) {
+                res.status(500).json({
+                  error: "Unable to add item",
+                });                
+            } else {
+                res.status(200).json({
+                  success: "OTP is Correct",
+                });
+            }
+        });
+
+
+        }
+      }
+    });
+  } catch (err) {
+    next({ status: 400 });
+  }
+};

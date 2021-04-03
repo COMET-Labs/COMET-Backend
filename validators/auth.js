@@ -58,7 +58,7 @@ exports.validateLoginWithPassword = [
   .withMessage('password must be 8 characters'),
   check("remember")
   .notEmpty()
-  .withMessage("Rembeber is required")
+  .withMessage("Remember is required")
   .isBoolean()
   .withMessage("Remember must be a Boolean")
 ]
@@ -69,10 +69,45 @@ exports.validateLoginWithLinkedIn = [
   .withMessage("AccessToken is Required"),
   check("remember")
   .notEmpty()
-  .withMessage("Rembeber is required")
+  .withMessage("Remember is required")
   .isBoolean()
   .withMessage("Remember must be a Boolean")
 ]
+
+exports.validateSignupWithPassword = [
+  check("fullName").notEmpty().withMessage("Please enter your name"),
+  check("password")
+  .notEmpty()
+  .withMessage('password is required')
+  .isLength({ min: 8 })
+  .withMessage('password must be 8 characters'),
+  check("rollNumber").notEmpty().withMessage("Roll number id required"),
+  check("contact").notEmpty().withMessage("Contact number is required"),
+  check("accessToken")
+  .notEmpty()
+  .withMessage("AccessToken is Required"),
+  check("personalEmail")
+  .notEmpty()
+  .withMessage('Personal Email is required')
+  .isEmail()
+  .withMessage("Invalid Personal Email"),
+  check("instituteEmail")
+  .notEmpty()
+  .withMessage('Institute Email is required')
+  .isEmail()
+  .withMessage("Invalid Institute Email"),  
+  check("personalEmailOtp")
+  .notEmpty()
+  .withMessage("OTP is required")
+  .isLength({ min: 4, max:4 })
+  .withMessage("Invalid OTP"),
+  check("instituteEmailOtp")
+  .notEmpty()
+  .withMessage("OTP is required")
+  .isLength({ min: 4, max:4 })
+  .withMessage("Invalid OTP")  
+]
+
 
 exports.isRequestValidated = (req, res, next) => {
   const errors = validationResult(req);
