@@ -29,7 +29,12 @@ exports.validateOtpRequest = [
   .notEmpty()
   .withMessage("OTP is required")
   .isLength({ min: 4, max:4 })
-  .withMessage("Invalid OTP")
+  .withMessage("Invalid OTP"),
+  check("newUser")
+  .notEmpty()
+  .withMessage("newUser is Required")
+  .isBoolean()
+  .withMessage("Invalid newUser")
 ]
 
 exports.validateSigninRequest = [
@@ -73,6 +78,17 @@ exports.validateLoginWithLinkedIn = [
   .isBoolean()
   .withMessage("Remember must be a Boolean")
 ]
+
+exports.validateResetPasswordRequest = [
+  check("temporaryToken")
+  .notEmpty()
+  .withMessage('temporaryToken is required'),
+  check("password")
+  .notEmpty()
+  .withMessage('password is required')
+  .isLength({ min: 8 })
+  .withMessage('password must be 8 characters')
+];
 
 exports.isRequestValidated = (req, res, next) => {
   const errors = validationResult(req);

@@ -10,6 +10,94 @@ AWS.config.update({
 
 var docClient = new AWS.DynamoDB.DocumentClient();
 
+exports.isNewUser = (req, res, next) => {
+  let params = {
+    TableName: "Users",
+    Key: {
+      personalEmail: req.body.email,
+    },
+  };
+  docClient.get(params, function (err, data) {
+    if (err) {
+      res.status(200).json({
+        error: "Some error occured",
+      });
+    } else {
+      if (data && data.Item) {
+        res.status(200).json({
+          error: "Already Registered Kindly Login",
+        });
+      } else {
+        next();
+      }
+    }
+  });
+};
+
+exports.isUserWithPassword = (req, res, next) => {
+  let params = {
+    TableName: "Users",
+    Key: {
+      personalEmail: req.body.email,
+    },
+  };
+
+  docClient.get(params, function (err, data) {
+    if (err) {
+      res.status(200).json({
+        error: "Some error occured",
+      });
+    } else {
+      if (data && data.Item) {
+        if (data.Item.passwordLess === false) {
+          next();
+        } else {
+          res.status(200).json({
+            error: "You account has no password. Login with Google or LinkedIn",
+          });
+        }
+      } else {
+        res.status(200).json({
+          error: "You do not have an account. Kindly Signup",
+        });
+      }
+    }
+  });
+};
+
+exports.resetPassword = (req, res, next) => {
+  try {
+    const email = jwt.verify(
+      req.body.temporaryToken,
+      process.env.RESET_PASSWORD_JWT_SECRET
+    ).email;
+    let updateParams = {
+      TableName: "Users",
+      Key: {
+        personalEmail: email,
+      },
+      UpdateExpression: "set hashPassword = :p",
+      ExpressionAttributeValues: {
+        ":p": req.body.password,
+      },
+      ReturnValues: "NONE",
+    };
+    docClient.update(updateParams, function (err, data) {
+      if (err) {
+        res.status(200).json({
+          error: "Some error occured",
+        });
+      } else {
+        res.status(200).json({
+          success: "Password Updated",
+        });
+      }
+    });
+  } catch (err) {
+    next({ status: 400, message:"Get a new OTP and verify your OTP Again" });
+  }
+};
+
 exports.mailOtp = async (req, res) => {
   try {
     const response = await axios.post(
@@ -45,8 +133,26 @@ exports.verifyOtp = (req, res) => {
         });
       } else {
         if (data && data.Item && data.Item.otp === req.body.otp) {
+          let tempToken;
+          if (req.body.newUser) {
+            tempToken = jwt.sign(
+              { email: req.body.email },
+              process.env.SIGNUP_JWT_SECRET,
+              {
+                expiresIn: "1d",
+              }
+            );
+          } else {
+            tempToken = jwt.sign(
+              { email: req.body.email },
+              process.env.RESET_PASSWORD_JWT_SECRET,
+              {
+                expiresIn: "1d",
+              }
+            );
+          }
           res.status(200).json({
-            success: "OTP is Correct",
+            temporaryToken: tempToken,
           });
         } else {
           res.status(200).json({
@@ -58,11 +164,6 @@ exports.verifyOtp = (req, res) => {
   } catch (err) {
     next({ status: 400 });
   }
-};
-
-exports.isIiitian = (req, res, next) => {
-  // more logic will be added later
-  next();
 };
 
 exports.loginWithPassword = (req, res) => {

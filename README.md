@@ -13,7 +13,20 @@ Massaging Plugin Backend
 * health check
 `/api`
 
-* POST /api/mailotp
+* POST /api/signup/mailotp
+    * Sample Request
+    ```json
+    {
+    "email":"example@gmail.com"
+    }
+    ```
+    * Sample Response 
+    ```json
+    {
+    "success": "OTP sent"
+    }
+    ```
+* POST /api/forgotpassword/mailotp
     * Sample Request
     ```json
     {
@@ -28,29 +41,33 @@ Massaging Plugin Backend
     ```
 * POST /api/verifyotp
     * Sample Request
+        * newUser true for signUp OTP verification
+        * newUser false for resetPassword OTP verification
     ```json
     {
         "email":"example@gmail.com",
-        "otp":"5248"
+        "otp":"5248",
+        "newUser":false
     }
     ```
     * Sample Response 
     ```json
     {
-    "success": "OTP is Correct"
+    "temporaryToken": "temp token with 1 day of validity which will be used at the signup time or at reset password time to verify that your otp has been verified."
     }
     ```
-* POST /api/verifyiiitianemail
+* POST /api/resetpassword
     * Sample Request
     ```json
     {
-    "email":"collegemail@iiit.ac.in"
+    "temporaryToken": "Temporary Token obtained after otp verification",
+    "password":"New Password"
     }
     ```
     * Sample Response 
     ```json
     {
-    "success": "OTP sent"
+    "success": "Password Updated"
     }
     ```
 * POST /api/loginwithpassword
@@ -63,10 +80,10 @@ Massaging Plugin Backend
     }
     ```
     * Sample Response 
+        * all or some portion of user data will be here as per requirement this is just a sample response
     ```json
     {
     "user": {
-        // all or some portion of user data will be here as per requirement this is just a sample response
         "passwordLess": false,
         "personalEmail": "example@gmail.com",
         "hashPassword": "hashofyourpassword",
@@ -76,9 +93,7 @@ Massaging Plugin Backend
     ```
 * POST /api/logout
     * Sample Request
-    ```json
-    // the accessToken should be present in the request header as bearer token
-    ```
+      * the accessToken should be present in the request header as bearer token
     * Sample Response 
     ```json
     {
@@ -93,11 +108,11 @@ Massaging Plugin Backend
     "remember":false
     }
     ```
-    * Sample Response 
+    * Sample Response
+        * all or some portion of user data will be here as per requirement this is just a sample response 
     ```json
     {
     "user": {
-        // all or some portion of user data will be here as per requirement this is just a sample response
         "passwordLess": false,
         "personalEmail": "example@gmail.com",
         "hashPassword": "hashofyourpassword",
