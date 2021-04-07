@@ -3,11 +3,13 @@ const router = express.Router();
 const {
   mailOtp,
   verifyOtp,
-  isIiitian,
   loginWithPassword,
   isAuthenticated,
   logout,
   loginWithLinkedIn,
+  isNewUser,
+  isUserWithPassword,
+  resetPassword,
 } = require("../controllers/auth");
 const {
   validateMailRequest,
@@ -15,12 +17,23 @@ const {
   isRequestValidated,
   validateLoginWithPassword,
   validateLoginWithLinkedIn,
+  validateResetPasswordRequest,
 } = require("../validators/auth");
 const { handleError } = require("../middlewares/index");
 router.post(
-  "/mailotp",
+  "/signup/mailotp",
   validateMailRequest,
   isRequestValidated,
+  isNewUser,
+  mailOtp,
+  handleError
+);
+
+router.post(
+  "/forgotpassword/mailotp",
+  validateMailRequest,
+  isRequestValidated,
+  isUserWithPassword,
   mailOtp,
   handleError
 );
@@ -30,15 +43,6 @@ router.post(
   validateOtpRequest,
   isRequestValidated,
   verifyOtp,
-  handleError
-);
-
-router.post(
-  "/verifyiiitianemail",
-  validateMailRequest,
-  isRequestValidated,
-  isIiitian,
-  mailOtp,
   handleError
 );
 
@@ -57,6 +61,14 @@ router.post(
   validateLoginWithLinkedIn,
   isRequestValidated,
   loginWithLinkedIn,
+  handleError
+);
+
+router.post(
+  "/resetpassword",
+  validateResetPasswordRequest,
+  isRequestValidated,
+  resetPassword,
   handleError
 );
 
