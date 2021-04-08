@@ -94,7 +94,7 @@ exports.resetPassword = (req, res, next) => {
       }
     });
   } catch (err) {
-    next({ status: 400, message:"Get a new OTP and verify your OTP Again" });
+    next({ status: 400, message: "Get a new OTP and verify your OTP Again" });
   }
 };
 
@@ -297,27 +297,27 @@ exports.logout = (req, res) => {
 exports.loginWithLinkedIn = async (req, res, next) => {
   try {
     let auth = "Bearer " + req.body.accessToken;
-    const userEmail = await axios.get(
-      "https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))",
-      {
-        method: "GET",
-        headers: { Connection: "Keep-Alive", Authorization: auth },
-      }
-    );
-    const email = userEmail.data.elements[0]["handle~"].emailAddress;
+    const response = await axios.get("https://api.linkedin.com/v2/me", {
+      method: "GET",
+      headers: { Connection: "Keep-Alive", Authorization: auth },
+    });
+    const linkeinId = response.data.id;
     let params = {
       TableName: "Users",
-      Key: {
-        personalEmail: email,
+      IndexName: "linkedin-index",
+      ExpressionAttributeValues: {
+        ":v1": linkeinId,
       },
+      KeyConditionExpression: "linkedin = :v1",
     };
-    docClient.get(params, function (err, data) {
+    docClient.query(params, function (err, data) {
       if (err) {
         res.status(200).json({
           error: "Some error occured",
         });
       } else {
-        if (data && data.Item) {
+        if (data && data.Items && data.Items[0]) {
+          const email = data.Items[0].personalEmail;
           const accessToken = jwt.sign(
             { email: email },
             process.env.JWT_SECRET,
