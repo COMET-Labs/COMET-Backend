@@ -120,3 +120,23 @@ Massaging Plugin Backend
         }
     }
     ```
+* POST /api/signup/nonini/passwordless
+    * Sample Request
+    ```json
+    {
+        "ini": "false",
+        "googleAccessToken": "xyz",
+        "googleRefreshToken": "xyz",
+        "passwordless": "",
+        "rollNumber": "2019IMT-005",
+        "contact": "1234567890",
+        "instituteEmail": "fake@xyz.com"
+    }
+    ```
+    * Sample Response
+        * AWS Response about whether the item is added or not. 
+    ```json
+    {
+        "success": "Item added successfully"
+    }
+    ```
