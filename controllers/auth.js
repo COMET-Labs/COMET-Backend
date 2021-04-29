@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const axios = require("axios").default;
 var AWS = require("aws-sdk");
+const fetch = require("node-fetch")
 
 AWS.config.update({
   region: process.env.region,
@@ -358,3 +359,94 @@ exports.loginWithLinkedIn = async (req, res, next) => {
     next({ status: 401 });
   }
 };
+
+
+exports.signupNoniniPasswordless = async (req, res, next) => {
+  try {
+
+    const tokenResponse = await axios.post(
+      "https://www.googleapis.com/oauth2/v4/token",
+      { 
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret:process.env.GOOGLE_CLIENT_SECRET,
+        refresh_token:req.body.googleRefreshToken,
+        grant_type: "refresh_token"
+      }
+    );
+
+    console.log(tokenResponse.data)
+    const userInfo = await getUserInfo(tokenResponse.data.access_token)
+    console.log(userInfo)
+    
+    let params = {
+      TableName: "Users",
+      Key: {
+        personalEmail: userInfo.email,
+      },
+    };
+    docClient.get(params, function (err, data) {
+      if (err) {
+        res.status(200).json({
+          error: "Some error occured",
+        });
+      } else {
+        if (data && data.Item) {
+          res.status(200).json({
+            error: "You already have an account. Kindly Login",
+          });
+        } else {
+
+
+          var createParams = {
+            TableName:"Users",
+            Item:{
+                "fullName": userInfo.name,
+                "firstName": userInfo.given_name,
+                "lastName": userInfo.family_name,
+                "rollNumber": req.body.rollNumber,
+                "contact": req.body.contact,
+                "refreshToken": req.body.googleRefreshToken,
+                "personalEmail": userInfo.email,
+                "instituteEmail": req.body.instituteEmail,
+                "dpProfile": userInfo.picture,
+            }
+        };
+        docClient.put(createParams, function(err, data) {
+            if (err) {
+                res.status(500).json({
+                  error: "Unable to add item",
+                });                
+            } else {
+                res.status(200).json({
+                  success: "Item added successfully",
+                });
+            }
+        });
+
+
+
+        }
+      }
+    });
+
+
+  } catch (err) {
+    console.log(err)
+    next({ status: 400 , err:err});
+  }  
+};
+
+// It will give name, ProfileURL, email address of the user signed by google.
+async function getUserInfo(accessToken) {
+  
+  const response = await fetch(
+    `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${accessToken}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    }
+  )
+  const json = await response.json()
+  return json
+}

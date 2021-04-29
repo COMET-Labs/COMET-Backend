@@ -10,6 +10,7 @@ const {
   isNewUser,
   isUserWithPassword,
   resetPassword,
+  signupNoniniPasswordless,
 } = require("../controllers/auth");
 const {
   validateMailRequest,
@@ -18,6 +19,7 @@ const {
   validateLoginWithPassword,
   validateLoginWithLinkedIn,
   validateResetPasswordRequest,
+  validateSignupNoniniPasswordless,
 } = require("../validators/auth");
 const { handleError } = require("../middlewares/index");
 router.post(
@@ -69,6 +71,14 @@ router.post(
   validateResetPasswordRequest,
   isRequestValidated,
   resetPassword,
+  handleError
+);
+
+router.post(
+  "/signup/nonini/passwordless",
+  validateSignupNoniniPasswordless,
+  isRequestValidated,
+  signupNoniniPasswordless,
   handleError
 );
 

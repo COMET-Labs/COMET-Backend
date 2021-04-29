@@ -90,6 +90,23 @@ exports.validateResetPasswordRequest = [
   .withMessage('password must be 8 characters')
 ];
 
+exports.validateSignupNoniniPasswordless = [
+  check("ini")
+  .notEmpty()
+  .withMessage("ini is required")
+  .isBoolean()
+  .withMessage("ini must be a Boolean"),
+  check("googleAccessToken")
+  .notEmpty()
+  .withMessage("Google Access Token is Required"),
+  check("googleRefreshToken")
+  .notEmpty()
+  .withMessage("Google Refresh Token is Required"),
+  check("passwordless")
+  .exists()
+  .withMessage("password is not required")
+];
+
 exports.isRequestValidated = (req, res, next) => {
   const errors = validationResult(req);
   if (errors.array().length > 0) {
