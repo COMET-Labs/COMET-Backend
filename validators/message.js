@@ -1,7 +1,7 @@
-const { check, validationResult } = require("express-validator");
+const { check, validationResult } = require('express-validator');
 
 exports.MessageValidated = [
-  check("messageBody").notEmpty().withMessage("Message should not be empty."),
+  check('messageBody').notEmpty().withMessage('Message should not be empty.'),
 ];
 
 exports.isMessageValidated = (req, res, next) => {

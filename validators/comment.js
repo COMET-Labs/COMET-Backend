@@ -1,13 +1,13 @@
-const { check, validationResult } = require("express-validator");
+const { check, validationResult } = require('express-validator');
 
 exports.commentValidated = [
-    check("commentBody").notEmpty().withMessage("Comment should not be empty.")
+  check('commentBody').notEmpty().withMessage('Comment should not be empty.'),
 ];
 
 exports.isCommentValidated = (req, res, next) => {
-    const errors = validationResult(req);
-    if (errors.array().length > 0) {
-        return res.status(400).json({ error: errors.array()[0].msg });
-    }
-    next();
-}
+  const errors = validationResult(req);
+  if (errors.array().length > 0) {
+    return res.status(400).json({ error: errors.array()[0].msg });
+  }
+  next();
+};
