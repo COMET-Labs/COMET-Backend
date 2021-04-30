@@ -395,22 +395,28 @@ exports.signupNoniniPasswordless = async (req, res, next) => {
             error: "You already have an account. Kindly Login",
           });
         } else {
-
-
-          var createParams = {
-            TableName:"Users",
-            Item:{
-                "fullName": userInfo.name,
-                "firstName": userInfo.given_name,
-                "lastName": userInfo.family_name,
-                "rollNumber": req.body.rollNumber,
-                "contact": req.body.contact,
-                "refreshToken": req.body.googleRefreshToken,
-                "personalEmail": userInfo.email,
-                "instituteEmail": req.body.instituteEmail,
-                "dpProfile": userInfo.picture,
-            }
-        };
+            const expTime = getExpTime()
+            console.log(expTime);
+            var createParams = {
+              TableName:"Users",
+              Item:{
+                  "fullName": userInfo.name,
+                  "fullNameInstitute": req.body.fullNameInstitute,
+                  "firstName": userInfo.given_name,
+                  "lastName": userInfo.family_name,
+                  "contact": req.body.contact,
+                  "personalEmail": userInfo.email,
+                  "instituteEmail": req.body.instituteEmail,
+                  "dpProfile": userInfo.picture,
+                  "discord": req.body.discord,
+                  "facebook": req.body.facebook,
+                  "instagram": req.body.instagram,
+                  "instituteName": req.body.instituteName,
+                  "batch": req.body.batch,
+                  "joiningYear": req.body.joiningYear,
+                  "expTime": expTime,
+              }
+          };
         docClient.put(createParams, function(err, data) {
             if (err) {
                 res.status(500).json({
@@ -431,7 +437,7 @@ exports.signupNoniniPasswordless = async (req, res, next) => {
 
 
   } catch (err) {
-    console.log(err)
+    // console.log(err)
     next({ status: 400 , err:err});
   }  
 };
@@ -450,3 +456,29 @@ async function getUserInfo(accessToken) {
   const json = await response.json()
   return json
 }
+
+function getExpTime() {
+  
+  var datetime = new Date();
+  var date = datetime.getDate();
+  // 0-index based month is returned
+  var month = datetime.getMonth() + 1;
+  var year = datetime.getFullYear();
+  date = date + parseInt(process.env.EXPIRATION_TIME);
+  var daysInMonth = new Date(year, month, 0).getDate();
+  console.log("number of days are => " + daysInMonth);
+  console.log("month => " + month);
+  console.log("year => " + year);
+  if(date>daysInMonth)
+  {
+    date-=daysInMonth;
+    month++;
+  }
+  if(month>12)
+  {
+    month = 1;
+    year++;
+  }
+  return (((date < 10)?"0":"") + date +"/"+(((month) < 10)?"0":"") + (month) +"/"+ year);
+}
+ 
