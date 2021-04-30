@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken");
 const axios = require("axios").default;
 var AWS = require("aws-sdk");
-const fetch = require("node-fetch")
 
 AWS.config.update({
   region: process.env.region,
@@ -445,16 +444,13 @@ exports.signupNoniniPasswordless = async (req, res, next) => {
 // It will give name, ProfileURL, email address of the user signed by google.
 async function getUserInfo(accessToken) {
   
-  const response = await fetch(
-    `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${accessToken}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    }
-  )
-  const json = await response.json()
-  return json
+  let auth = "Bearer " + accessToken;
+  const response = await axios.get("https://www.googleapis.com/oauth2/v1/userinfo", {
+    method: "GET",
+    headers: { Connection: "Keep-Alive", Authorization: auth },
+  });
+  
+  return response.data
 }
 
 function getExpTime() {
