@@ -141,7 +141,7 @@ Massaging Plugin Backend
         * AWS Response about whether the item is added or not. 
     ```json
     {
-        "success": "Item added successfully"
+        "success": "SignUp Successful"
     }
     ```
 
@@ -166,14 +166,17 @@ Massaging Plugin Backend
         * AWS Response about whether the item is added or not. 
     ```json
     {
-        "success": "Item added successfully"
+        "success": "SignUp Successful"
     }
     ```    
     * POST /api/signup/nonini/password
     * Sample Request
     ```json
     {
+     "fullName": "fullName",
       "fullNameInstitute": "fullNameInstitute",
+      "firstName": "firstName",
+      "lastName": "lastName",        
       "contact": "contact",
       "instituteEmail": "instituteEmail",
       "discord": "discord",
@@ -192,6 +195,37 @@ Massaging Plugin Backend
         * AWS Response about whether the item is added or not. 
     ```json
     {
-        "success": "Item added successfully"
+        "success": "SignUp Successful"
     }
     ``` 
+
+    * POST /api/signup/ini/password
+    * Sample Request
+    ```json
+    {
+
+      "fullName": "fullName",
+      "fullNameInstitute": "fullNameInstitute",
+      "firstName": "firstName",
+      "lastName": "lastName",
+      "contact": "contact",
+      "instituteEmail": "instituteEmail",
+      "discord": "discord",
+      "facebook": "facebook",
+      "instagram": "instagram",
+      "instituteName": "instituteName",
+      "batch": "batch",
+      "joiningYear": "joiningYear",
+      "linkedinAccessToken": "Linkedin Access Token",
+      "googleRefreshToken": "Google Refresh Token",
+      "hashPassword": "Password",
+      "personalEmail": "Personal Email"
+    }
+    ```
+    * Sample Response
+        * AWS Response about whether the item is added or not. 
+    ```json
+    {
+        "success": "SignUp Successful"
+    }
+    ```     
