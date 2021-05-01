@@ -187,7 +187,6 @@ exports.loginWithPassword = (req, res, next) => {
             result = await bcrypt.compare(req.body.password, data.Item.hashPassword);
               req.body.password,
               data.Item.hashPassword
-            );
             if (result) {
               const accessToken = jwt.sign(
                 { email: req.body.email },
@@ -233,9 +232,11 @@ exports.loginWithPassword = (req, res, next) => {
         }
       }
     });
+    
   } catch (err) {
     next({ status: 400 });
   }
+
 };
 
 exports.isAuthenticated = (req, res, next) => {
