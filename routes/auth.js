@@ -13,6 +13,7 @@ const {
   signupNoniniPasswordless,
   signupiniPasswordless,
   signupnoniniPassword,
+  signupiniPassword,
   linkedinInfo,
   getEmail,
   checkUser,
@@ -110,6 +111,16 @@ router.post(
   checkUser,
   linkedinInfo,
   signupnoniniPassword,
+  handleError
+);
+
+router.post(
+  '/signup/ini/password',
+  validateSignupNoniniPassword,
+  isRequestValidated,
+  checkUser,
+  linkedinInfo,
+  signupiniPassword,
   handleError
 );
 

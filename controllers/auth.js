@@ -482,6 +482,48 @@ exports.signupnoniniPassword = async (req, res, next) => {
   });
 };
 
+
+exports.signupiniPassword = async (req, res, next) => {
+
+  req.body.hashPassword = await bcrypt.hash(req.body.hashPassword,5);
+  let expTime = Math.floor(Date.now() / 1000);
+  expTime = expTime + parseInt(process.env.EXPIRATION_TIME)
+  
+  var createParams = {
+    TableName: 'Users',
+    Item: {
+      fullName: req.body.fullName,
+      fullNameInstitute: req.body.fullNameInstitute,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      contact: req.body.contact,
+      personalEmail: req.body.personalEmail,
+      instituteEmail: req.body.instituteEmail,
+      discord: req.body.discord,
+      facebook: req.body.facebook,
+      instagram: req.body.instagram,
+      instituteName: req.body.instituteName,
+      batch: req.body.batch,
+      joiningYear: req.body.joiningYear,
+      linkedin: req.body.linkedinId,
+      hashPassword: req.body.hashPassword,
+      expTime: expTime,
+    },
+  };
+
+  docClient.put(createParams, function (err, data) {
+    if (err) {
+      res.status(500).json({
+        error: 'Unable to add item',
+      });
+    } else {
+      res.status(200).json({
+        success: 'SignUp Successful',
+      });
+    }
+  });
+};
+
 // It will give name, ProfileURL, email address of the user signed by google.
 async function getUserInfo(accessToken) {
   let auth = 'Bearer ' + accessToken;
