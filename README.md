@@ -124,14 +124,9 @@ Massaging Plugin Backend
     * Sample Request
     ```json
     {
-      "fullName": "fullName",
       "fullNameInstitute": "fullNameInstitute",
-      "firstName": "firstName",
-      "lastName": "lastName",
       "contact": "contact",
-      "personalEmail": "personalEmail",
       "instituteEmail": "instituteEmail",
-      "dpProfile": "dpProfile",
       "discord": "discord",
       "facebook": "facebook",
       "instagram": "instagram",
@@ -149,3 +144,28 @@ Massaging Plugin Backend
         "success": "Item added successfully"
     }
     ```
+
+* POST /api/signup/ini/passwordless
+    * Sample Request
+    ```json
+    {
+      "fullNameInstitute": "fullNameInstitute",
+      "contact": "contact",
+      "instituteEmail": "instituteEmail",
+      "discord": "discord",
+      "facebook": "facebook",
+      "instagram": "instagram",
+      "instituteName": "instituteName",
+      "batch": "batch",
+      "joiningYear": "joiningYear",
+      "linkedinAccessToken": "Linkedin Access Token",
+      "googleRefreshToken": "Google Refresh Token",      
+    }
+    ```
+    * Sample Response
+        * AWS Response about whether the item is added or not. 
+    ```json
+    {
+        "success": "Item added successfully"
+    }
+    ```    

@@ -11,6 +11,7 @@ const {
   isUserWithPassword,
   resetPassword,
   signupNoniniPasswordless,
+  signupiniPasswordless,
   linkedinInfo,
   getEmail,
   checkUser,
@@ -86,6 +87,17 @@ router.post(
   checkUser,
   linkedinInfo,
   signupNoniniPasswordless,
+  handleError
+);
+
+router.post(
+  '/signup/ini/passwordless',
+  validateSignupNoniniPasswordless,
+  isRequestValidated,
+  getEmail,
+  checkUser,
+  linkedinInfo,
+  signupiniPasswordless,
   handleError
 );
 

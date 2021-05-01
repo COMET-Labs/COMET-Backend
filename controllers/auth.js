@@ -401,6 +401,49 @@ exports.signupNoniniPasswordless = async (req, res, next) => {
   });
 };
 
+exports.signupiniPasswordless = async (req, res, next) => {
+  
+  // console.log(Date.now());
+  // expTime is in milliseconds
+  let expTime = Math.floor(Date.now() / 1000);
+  expTime = expTime + parseInt(process.env.EXPIRATION_TIME)
+  // console.log(expTime);  
+  
+  var createParams = {
+    TableName: 'Users',
+    Item: {
+      fullName: req.body.userInfo.name,
+      fullNameInstitute: req.body.fullNameInstitute,
+      firstName: req.body.userInfo.given_name,
+      lastName: req.body.userInfo.family_name,
+      contact: req.body.contact,
+      personalEmail: req.body.userInfo.email,
+      instituteEmail: req.body.instituteEmail,
+      dpProfile: req.body.userInfo.picture,
+      discord: req.body.discord,
+      facebook: req.body.facebook,
+      instagram: req.body.instagram,
+      instituteName: req.body.instituteName,
+      batch: req.body.batch,
+      joiningYear: req.body.joiningYear,
+      linkedin: req.body.linkedinId,
+      expTime: expTime,
+    },
+  };
+
+  docClient.put(createParams, function (err, data) {
+    if (err) {
+      res.status(500).json({
+        error: 'Unable to add item',
+      });
+    } else {
+      res.status(200).json({
+        success: 'SignUp Successful',
+      });
+    }
+  });
+};
+
 // It will give name, ProfileURL, email address of the user signed by google.
 async function getUserInfo(accessToken) {
   let auth = 'Bearer ' + accessToken;
