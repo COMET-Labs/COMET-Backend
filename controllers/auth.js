@@ -366,8 +366,7 @@ exports.loginWithLinkedIn = async (req, res, next) => {
 };
 
 exports.signupNoniniPasswordless = async (req, res, next) => {
-  const expTime = getExpTime();
-
+  
   var createParams = {
     TableName: 'Users',
     Item: {
@@ -385,7 +384,6 @@ exports.signupNoniniPasswordless = async (req, res, next) => {
       instituteName: req.body.instituteName,
       batch: req.body.batch,
       joiningYear: req.body.joiningYear,
-      expTime: expTime,
       linkedin: req.body.linkedinId,
     },
   };
@@ -397,7 +395,7 @@ exports.signupNoniniPasswordless = async (req, res, next) => {
       });
     } else {
       res.status(200).json({
-        success: 'Item added successfully',
+        success: 'SignUp Successful',
       });
     }
   });
@@ -415,33 +413,6 @@ async function getUserInfo(accessToken) {
   );
 
   return response.data;
-}
-
-function getExpTime() {
-  var datetime = new Date();
-  var date = datetime.getDate();
-  // 0-index based month is returned
-  var month = datetime.getMonth() + 1;
-  var year = datetime.getFullYear();
-  date = date + parseInt(process.env.EXPIRATION_TIME);
-  var daysInMonth = new Date(year, month, 0).getDate();
-  if (date > daysInMonth) {
-    date -= daysInMonth;
-    month++;
-  }
-  if (month > 12) {
-    month = 1;
-    year++;
-  }
-  return (
-    (date < 10 ? '0' : '') +
-    date +
-    '/' +
-    (month < 10 ? '0' : '') +
-    month +
-    '/' +
-    year
-  );
 }
 
 // It checks whether there is a user with same linkedin-id or not

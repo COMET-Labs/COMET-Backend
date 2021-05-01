@@ -124,8 +124,22 @@ Massaging Plugin Backend
     * Sample Request
     ```json
     {
-        "linkedinAccessToken": "Linkedin Access Token",
-        "googleRefreshToken": "Google Refresh Token",
+      "fullName": "fullName",
+      "fullNameInstitute": "fullNameInstitute",
+      "firstName": "firstName",
+      "lastName": "lastName",
+      "contact": "contact",
+      "personalEmail": "personalEmail",
+      "instituteEmail": "instituteEmail",
+      "dpProfile": "dpProfile",
+      "discord": "discord",
+      "facebook": "facebook",
+      "instagram": "instagram",
+      "instituteName": "instituteName",
+      "batch": "batch",
+      "joiningYear": "joiningYear",
+      "linkedinAccessToken": "Linkedin Access Token",
+      "googleRefreshToken": "Google Refresh Token",      
     }
     ```
     * Sample Response
