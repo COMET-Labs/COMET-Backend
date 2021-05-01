@@ -124,13 +124,8 @@ Massaging Plugin Backend
     * Sample Request
     ```json
     {
-        "ini": "false",
-        "googleAccessToken": "xyz",
-        "googleRefreshToken": "xyz",
-        "passwordless": "",
-        "rollNumber": "2019IMT-005",
-        "contact": "1234567890",
-        "instituteEmail": "fake@xyz.com"
+        "linkedinAccessToken": "Linkedin Access Token",
+        "googleRefreshToken": "Google Refresh Token",
     }
     ```
     * Sample Response
