@@ -91,6 +91,9 @@ exports.validateResetPasswordRequest = [
 ];
 
 exports.validateSignupNoniniPasswordless = [
+  check("linkedinAccessToken")
+  .notEmpty()
+  .withMessage("Linkedin Access Token is Required"),  
   check("googleRefreshToken")
   .notEmpty()
   .withMessage("Google Refresh Token is Required"),

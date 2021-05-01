@@ -11,6 +11,9 @@ const {
   isUserWithPassword,
   resetPassword,
   signupNoniniPasswordless,
+  linkedinInfo,
+  getEmail,
+  checkUser,
 } = require("../controllers/auth");
 const {
   validateMailRequest,
@@ -78,6 +81,9 @@ router.post(
   "/signup/nonini/passwordless",
   validateSignupNoniniPasswordless,
   isRequestValidated,
+  getEmail,
+  checkUser,
+  linkedinInfo,
   signupNoniniPasswordless,
   handleError
 );

@@ -355,90 +355,48 @@ exports.loginWithLinkedIn = async (req, res, next) => {
       }
     });
   } catch (err) {
-    next({ status: 401 });
+    next({ status: 401});
   }
 };
 
 
 exports.signupNoniniPasswordless = async (req, res, next) => {
-  try {
+  const expTime = getExpTime()
 
-    const tokenResponse = await axios.post(
-      "https://www.googleapis.com/oauth2/v4/token",
-      { 
-        client_id: process.env.GOOGLE_CLIENT_ID,
-        client_secret:process.env.GOOGLE_CLIENT_SECRET,
-        refresh_token:req.body.googleRefreshToken,
-        grant_type: "refresh_token"
-      }
-    );
-
-    console.log(tokenResponse.data)
-    const userInfo = await getUserInfo(tokenResponse.data.access_token)
-    console.log(userInfo)
-    
-    let params = {
-      TableName: "Users",
-      Key: {
-        personalEmail: userInfo.email,
-      },
-    };
-    docClient.get(params, function (err, data) {
-      if (err) {
+  var createParams = {
+    TableName:"Users",
+    Item:{
+        "fullName": userInfo.name,
+        "fullNameInstitute": req.body.fullNameInstitute,
+        "firstName": userInfo.given_name,
+        "lastName": userInfo.family_name,
+        "contact": req.body.contact,
+        "personalEmail": userInfo.email,
+        "instituteEmail": req.body.instituteEmail,
+        "dpProfile": userInfo.picture,
+        "discord": req.body.discord,
+        "facebook": req.body.facebook,
+        "instagram": req.body.instagram,
+        "instituteName": req.body.instituteName,
+        "batch": req.body.batch,
+        "joiningYear": req.body.joiningYear,
+        "expTime": expTime,
+        "linkedin": req.body.linkedinId
+    }
+  };
+  
+  docClient.put(createParams, function(err, data) {
+    if (err) {
+        res.status(500).json({
+          error: "Unable to add item",
+        });                
+    } else {
         res.status(200).json({
-          error: "Some error occured",
+          success: "Item added successfully",
         });
-      } else {
-        if (data && data.Item) {
-          res.status(200).json({
-            error: "You already have an account. Kindly Login",
-          });
-        } else {
-            const expTime = getExpTime()
-            console.log(expTime);
-            var createParams = {
-              TableName:"Users",
-              Item:{
-                  "fullName": userInfo.name,
-                  "fullNameInstitute": req.body.fullNameInstitute,
-                  "firstName": userInfo.given_name,
-                  "lastName": userInfo.family_name,
-                  "contact": req.body.contact,
-                  "personalEmail": userInfo.email,
-                  "instituteEmail": req.body.instituteEmail,
-                  "dpProfile": userInfo.picture,
-                  "discord": req.body.discord,
-                  "facebook": req.body.facebook,
-                  "instagram": req.body.instagram,
-                  "instituteName": req.body.instituteName,
-                  "batch": req.body.batch,
-                  "joiningYear": req.body.joiningYear,
-                  "expTime": expTime,
-              }
-          };
-        docClient.put(createParams, function(err, data) {
-            if (err) {
-                res.status(500).json({
-                  error: "Unable to add item",
-                });                
-            } else {
-                res.status(200).json({
-                  success: "Item added successfully",
-                });
-            }
-        });
+    }
+  });  
 
-
-
-        }
-      }
-    });
-
-
-  } catch (err) {
-    // console.log(err)
-    next({ status: 400 , err:err});
-  }  
 };
 
 // It will give name, ProfileURL, email address of the user signed by google.
@@ -462,9 +420,6 @@ function getExpTime() {
   var year = datetime.getFullYear();
   date = date + parseInt(process.env.EXPIRATION_TIME);
   var daysInMonth = new Date(year, month, 0).getDate();
-  console.log("number of days are => " + daysInMonth);
-  console.log("month => " + month);
-  console.log("year => " + year);
   if(date>daysInMonth)
   {
     date-=daysInMonth;
@@ -476,5 +431,94 @@ function getExpTime() {
     year++;
   }
   return (((date < 10)?"0":"") + date +"/"+(((month) < 10)?"0":"") + (month) +"/"+ year);
-}
- 
+} 
+
+// It checks whether there is a user with same linkedin-id or not
+exports.linkedinInfo = async (req,res,next) => {
+  let auth = "Bearer " + req.body.linkedinAccessToken;
+  const response = await axios.get("https://api.linkedin.com/v2/me", {
+    method: "GET",
+    headers: { Connection: "Keep-Alive", Authorization: auth },
+  });
+  let params = {
+    TableName: "Users",
+    IndexName: "linkedin-index",
+    ExpressionAttributeValues: {
+      ":v1": response.data.id,
+    },
+    KeyConditionExpression: "linkedin = :v1",
+  };
+try{
+  docClient.query(params, function (err, data) {
+      if (data && data.Items && data.Items[0]) {
+        res.status(200).json({
+          error: "You have an linkedin account with different personal email ID",
+        });
+      }else{
+        req.body.linkedinId = response.data.id
+        next();
+      }
+  });  
+  }catch(err){
+    res.status(200).json({
+      error: err
+    });
+  }
+
+} 
+
+exports.getEmail = async (req,res,next) => {
+  try {
+    
+    const tokenResponse = await axios.post(
+      "https://www.googleapis.com/oauth2/v4/token",
+      { 
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret:process.env.GOOGLE_CLIENT_SECRET,
+        refresh_token:req.body.googleRefreshToken,
+        grant_type: "refresh_token"
+      }
+    );
+    const userInfo = await getUserInfo(tokenResponse.data.access_token)
+    req.body.personalEmail = userInfo.email;
+    // console.log(userInfo.email);
+    next();
+  } catch (err) {
+    res.status(200).json({
+      error: err
+    });
+  }
+} 
+
+exports.checkUser = async (req,res,next) => {
+  try {
+    
+    let params = {
+      TableName: "Users",
+      Key: {
+        personalEmail: req.body.personalEmail,
+      },
+    };
+    docClient.get(params, function (err, data) {
+      if (err) {
+        res.status(200).json({
+          error: "Some error occured",
+        });
+      } else {
+        if (data && data.Item) {
+          res.status(200).json({
+            error: "You already have an account. Kindly Login",
+          });
+        }
+        else{
+          next();
+        } 
+      }
+    });
+  } catch (err) {
+    res.status(200).json({
+      error: err
+    });
+  } 
+} 
+
