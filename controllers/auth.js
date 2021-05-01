@@ -371,14 +371,14 @@ exports.signupNoniniPasswordless = async (req, res, next) => {
   var createParams = {
     TableName: 'Users',
     Item: {
-      fullName: userInfo.name,
+      fullName: req.body.userInfo.name,
       fullNameInstitute: req.body.fullNameInstitute,
-      firstName: userInfo.given_name,
-      lastName: userInfo.family_name,
+      firstName: req.body.userInfo.given_name,
+      lastName: req.body.userInfo.family_name,
       contact: req.body.contact,
-      personalEmail: userInfo.email,
+      personalEmail: req.body.userInfo.email,
       instituteEmail: req.body.instituteEmail,
-      dpProfile: userInfo.picture,
+      dpProfile: req.body.userInfo.picture,
       discord: req.body.discord,
       facebook: req.body.facebook,
       instagram: req.body.instagram,
@@ -491,6 +491,7 @@ exports.getEmail = async (req, res, next) => {
     );
     const userInfo = await getUserInfo(tokenResponse.data.access_token);
     req.body.personalEmail = userInfo.email;
+    req.body.userInfo = userInfo;
     // console.log(userInfo.email);
     next();
   } catch (err) {
