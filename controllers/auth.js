@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const axios = require('axios').default;
 var AWS = require('aws-sdk');
+const bcrypt = require('bcrypt');
 
 AWS.config.update({
   region: process.env.region,
@@ -49,7 +50,7 @@ exports.isUserWithPassword = (req, res, next) => {
       });
     } else {
       if (data && data.Item) {
-        if (data.Item.passwordLess === false) {
+        if (data.Item.hashPassword) {
           next();
         } else {
           res.status(200).json({
@@ -98,7 +99,7 @@ exports.resetPassword = (req, res, next) => {
   }
 };
 
-exports.mailOtp = async (req, res) => {
+exports.mailOtp = async (req, res, next) => {
   try {
     const response = await axios.post(
       'https://66ec05ryyl.execute-api.us-east-2.amazonaws.com/getOtpFromEmail',
@@ -118,7 +119,7 @@ exports.mailOtp = async (req, res) => {
   }
 };
 
-exports.verifyOtp = (req, res) => {
+exports.verifyOtp = (req, res, next) => {
   try {
     var params = {
       TableName: 'otp',
@@ -166,7 +167,7 @@ exports.verifyOtp = (req, res) => {
   }
 };
 
-exports.loginWithPassword = (req, res) => {
+exports.loginWithPassword = (req, res, next) => {
   try {
     let params = {
       TableName: 'Users',
@@ -174,51 +175,56 @@ exports.loginWithPassword = (req, res) => {
         personalEmail: req.body.email,
       },
     };
-    docClient.get(params, function (err, data) {
+    docClient.get(params, async function (err, data) {
       if (err) {
         res.status(200).json({
           error: 'Some error occured',
         });
       } else {
         if (data && data.Item) {
-          const hash = 'hash'; // will be replaced by function soon
-          if (
-            data.Item.passwordLess === false &&
-            data.Item.hashPassword === hash
-          ) {
-            const accessToken = jwt.sign(
-              { email: req.body.email },
-              process.env.JWT_SECRET,
-              {
-                expiresIn: req.body.remember === true ? '30d' : '1d',
-              }
+          let result;
+          try {
+            result = await bcrypt.compare(req.body.password, data.Item.hashPassword);
+              req.body.password,
+              data.Item.hashPassword
             );
-            let updateParams = {
-              TableName: 'Users',
-              Key: {
-                personalEmail: req.body.email,
-              },
-              UpdateExpression: 'set accessToken = :a',
-              ExpressionAttributeValues: {
-                ':a': accessToken,
-              },
-              ReturnValues: 'ALL_NEW',
-            };
-            docClient.update(updateParams, function (err, data) {
-              if (err) {
-                res.status(200).json({
-                  error: 'Some error occured',
-                });
-              } else {
-                res.status(200).json({
-                  user: { ...data.Attributes },
-                });
-              }
-            });
-          } else {
-            res.status(200).json({
-              error: 'Invalid email/password combination',
-            });
+            if (result) {
+              const accessToken = jwt.sign(
+                { email: req.body.email },
+                process.env.JWT_SECRET,
+                {
+                  expiresIn: req.body.remember === true ? '30d' : '1d',
+                }
+              );
+              let updateParams = {
+                TableName: 'Users',
+                Key: {
+                  personalEmail: req.body.email,
+                },
+                UpdateExpression: 'set accessToken = :a',
+                ExpressionAttributeValues: {
+                  ':a': accessToken,
+                },
+                ReturnValues: 'ALL_NEW',
+              };
+              docClient.update(updateParams, function (err, data) {
+                if (err) {
+                  res.status(200).json({
+                    error: 'Some error occured',
+                  });
+                } else {
+                  res.status(200).json({
+                    user: { ...data.Attributes },
+                  });
+                }
+              });
+            } else {
+              res.status(200).json({
+                error: 'Invalid email/password combination',
+              });
+            }
+          } catch (err) {
+            next({ status: 500, message: err });
           }
         } else {
           res.status(200).json({
@@ -265,7 +271,7 @@ exports.isAuthenticated = (req, res, next) => {
   }
 };
 
-exports.logout = (req, res) => {
+exports.logout = (req, res, next) => {
   try {
     let updateParams = {
       TableName: 'Users',

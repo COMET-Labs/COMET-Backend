@@ -55,6 +55,7 @@ router.post(
   '/loginwithpassword',
   validateLoginWithPassword,
   isRequestValidated,
+  isUserWithPassword,
   loginWithPassword,
   handleError
 );
