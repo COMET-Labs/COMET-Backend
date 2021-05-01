@@ -95,6 +95,20 @@ exports.validateSignupNoniniPasswordless = [
     .withMessage('Google Refresh Token is Required'),
 ];
 
+exports.validateSignupNoniniPassword = [
+  check('linkedinAccessToken')
+    .notEmpty()
+    .withMessage('Linkedin Access Token is Required'),
+  check('personalEmail')
+    .notEmpty()
+    .withMessage('Personal Email is Required'),    
+  check('hashPassword')
+    .notEmpty()
+    .withMessage('password is required')
+    .isLength({ min: 8 })
+    .withMessage('password must be 8 characters'),
+];
+
 exports.isRequestValidated = (req, res, next) => {
   const errors = validationResult(req);
   if (errors.array().length > 0) {

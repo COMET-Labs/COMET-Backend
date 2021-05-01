@@ -169,3 +169,29 @@ Massaging Plugin Backend
         "success": "Item added successfully"
     }
     ```    
+    * POST /api/signup/nonini/password
+    * Sample Request
+    ```json
+    {
+      "fullNameInstitute": "fullNameInstitute",
+      "contact": "contact",
+      "instituteEmail": "instituteEmail",
+      "discord": "discord",
+      "facebook": "facebook",
+      "instagram": "instagram",
+      "instituteName": "instituteName",
+      "batch": "batch",
+      "joiningYear": "joiningYear",
+      "linkedinAccessToken": "Linkedin Access Token",
+      "googleRefreshToken": "Google Refresh Token",
+      "hashPassword": "Password",
+      "personalEmail": "Personal Email"
+    }
+    ```
+    * Sample Response
+        * AWS Response about whether the item is added or not. 
+    ```json
+    {
+        "success": "Item added successfully"
+    }
+    ``` 
