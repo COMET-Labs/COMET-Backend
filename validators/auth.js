@@ -86,6 +86,15 @@ exports.validateResetPasswordRequest = [
     .withMessage('password must be 8 characters'),
 ];
 
+exports.validateSignupNoniniPasswordless = [
+  check('linkedinAccessToken')
+    .notEmpty()
+    .withMessage('Linkedin Access Token is Required'),
+  check('googleRefreshToken')
+    .notEmpty()
+    .withMessage('Google Refresh Token is Required'),
+];
+
 exports.isRequestValidated = (req, res, next) => {
   const errors = validationResult(req);
   if (errors.array().length > 0) {

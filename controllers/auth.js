@@ -184,7 +184,10 @@ exports.loginWithPassword = (req, res, next) => {
         if (data && data.Item) {
           let result;
           try {
-            result = await bcrypt.compare(req.body.password, data.Item.hashPassword);
+            result = await bcrypt.compare(
+              req.body.password,
+              data.Item.hashPassword
+            );
             if (result) {
               const accessToken = jwt.sign(
                 { email: req.body.email },
@@ -359,5 +362,142 @@ exports.loginWithLinkedIn = async (req, res, next) => {
     });
   } catch (err) {
     next({ status: 401 });
+  }
+};
+
+exports.signupNoniniPasswordless = async (req, res, next) => {
+  
+  var createParams = {
+    TableName: 'Users',
+    Item: {
+      fullName: req.body.userInfo.name,
+      fullNameInstitute: req.body.fullNameInstitute,
+      firstName: req.body.userInfo.given_name,
+      lastName: req.body.userInfo.family_name,
+      contact: req.body.contact,
+      personalEmail: req.body.userInfo.email,
+      instituteEmail: req.body.instituteEmail,
+      dpProfile: req.body.userInfo.picture,
+      discord: req.body.discord,
+      facebook: req.body.facebook,
+      instagram: req.body.instagram,
+      instituteName: req.body.instituteName,
+      batch: req.body.batch,
+      joiningYear: req.body.joiningYear,
+      linkedin: req.body.linkedinId,
+    },
+  };
+
+  docClient.put(createParams, function (err, data) {
+    if (err) {
+      res.status(500).json({
+        error: 'Unable to add item',
+      });
+    } else {
+      res.status(200).json({
+        success: 'SignUp Successful',
+      });
+    }
+  });
+};
+
+// It will give name, ProfileURL, email address of the user signed by google.
+async function getUserInfo(accessToken) {
+  let auth = 'Bearer ' + accessToken;
+  const response = await axios.get(
+    'https://www.googleapis.com/oauth2/v1/userinfo',
+    {
+      method: 'GET',
+      headers: { Connection: 'Keep-Alive', Authorization: auth },
+    }
+  );
+
+  return response.data;
+}
+
+// It checks whether there is a user with same linkedin-id or not
+exports.linkedinInfo = async (req, res, next) => {
+  let auth = 'Bearer ' + req.body.linkedinAccessToken;
+  const response = await axios.get('https://api.linkedin.com/v2/me', {
+    method: 'GET',
+    headers: { Connection: 'Keep-Alive', Authorization: auth },
+  });
+  let params = {
+    TableName: 'Users',
+    IndexName: 'linkedin-index',
+    ExpressionAttributeValues: {
+      ':v1': response.data.id,
+    },
+    KeyConditionExpression: 'linkedin = :v1',
+  };
+  try {
+    docClient.query(params, function (err, data) {
+      if (data && data.Items && data.Items[0]) {
+        res.status(200).json({
+          error:
+            'You have an linkedin account with different personal email ID',
+        });
+      } else {
+        req.body.linkedinId = response.data.id;
+        next();
+      }
+    });
+  } catch (err) {
+    res.status(200).json({
+      error: err,
+    });
+  }
+};
+
+exports.getEmail = async (req, res, next) => {
+  try {
+    const tokenResponse = await axios.post(
+      'https://www.googleapis.com/oauth2/v4/token',
+      {
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        refresh_token: req.body.googleRefreshToken,
+        grant_type: 'refresh_token',
+      }
+    );
+    const userInfo = await getUserInfo(tokenResponse.data.access_token);
+    req.body.personalEmail = userInfo.email;
+    req.body.userInfo = userInfo;
+    // console.log(userInfo.email);
+    next();
+  } catch (err) {
+    res.status(200).json({
+      error: err,
+    });
+  }
+};
+
+exports.checkUser = async (req, res, next) => {
+  try {
+    let params = {
+      TableName: 'Users',
+      Key: {
+        personalEmail: req.body.personalEmail,
+      },
+    };
+    docClient.get(params, function (err, data) {
+      if (err) {
+        res.status(200).json({
+          error: 'Some error occured',
+        });
+      } else {
+        if (data && data.Item) {
+          res.status(200).json({
+            error: 'You already have an account. Kindly Login',
+          });
+        } else {
+          next();
+        }
+      }
+    });
+  } catch (err) {
+    res.status(200).json({
+      error: err,
+    });
   }
 };

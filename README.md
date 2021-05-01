@@ -120,3 +120,32 @@ Massaging Plugin Backend
         }
     }
     ```
+* POST /api/signup/nonini/passwordless
+    * Sample Request
+    ```json
+    {
+      "fullName": "fullName",
+      "fullNameInstitute": "fullNameInstitute",
+      "firstName": "firstName",
+      "lastName": "lastName",
+      "contact": "contact",
+      "personalEmail": "personalEmail",
+      "instituteEmail": "instituteEmail",
+      "dpProfile": "dpProfile",
+      "discord": "discord",
+      "facebook": "facebook",
+      "instagram": "instagram",
+      "instituteName": "instituteName",
+      "batch": "batch",
+      "joiningYear": "joiningYear",
+      "linkedinAccessToken": "Linkedin Access Token",
+      "googleRefreshToken": "Google Refresh Token",      
+    }
+    ```
+    * Sample Response
+        * AWS Response about whether the item is added or not. 
+    ```json
+    {
+        "success": "Item added successfully"
+    }
+    ```
