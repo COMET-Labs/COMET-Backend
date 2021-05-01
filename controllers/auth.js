@@ -1,6 +1,6 @@
-const jwt = require("jsonwebtoken");
-const axios = require("axios").default;
-var AWS = require("aws-sdk");
+const jwt = require('jsonwebtoken');
+const axios = require('axios').default;
+var AWS = require('aws-sdk');
 
 AWS.config.update({
   region: process.env.region,
@@ -12,7 +12,7 @@ var docClient = new AWS.DynamoDB.DocumentClient();
 
 exports.isNewUser = (req, res, next) => {
   let params = {
-    TableName: "Users",
+    TableName: 'Users',
     Key: {
       personalEmail: req.body.email,
     },
@@ -20,12 +20,12 @@ exports.isNewUser = (req, res, next) => {
   docClient.get(params, function (err, data) {
     if (err) {
       res.status(200).json({
-        error: "Some error occured",
+        error: 'Some error occured',
       });
     } else {
       if (data && data.Item) {
         res.status(200).json({
-          error: "Already Registered Kindly Login",
+          error: 'Already Registered Kindly Login',
         });
       } else {
         next();
@@ -36,7 +36,7 @@ exports.isNewUser = (req, res, next) => {
 
 exports.isUserWithPassword = (req, res, next) => {
   let params = {
-    TableName: "Users",
+    TableName: 'Users',
     Key: {
       personalEmail: req.body.email,
     },
@@ -45,7 +45,7 @@ exports.isUserWithPassword = (req, res, next) => {
   docClient.get(params, function (err, data) {
     if (err) {
       res.status(200).json({
-        error: "Some error occured",
+        error: 'Some error occured',
       });
     } else {
       if (data && data.Item) {
@@ -53,12 +53,12 @@ exports.isUserWithPassword = (req, res, next) => {
           next();
         } else {
           res.status(200).json({
-            error: "You account has no password. Login with Google or LinkedIn",
+            error: 'You account has no password. Login with Google or LinkedIn',
           });
         }
       } else {
         res.status(200).json({
-          error: "You do not have an account. Kindly Signup",
+          error: 'You do not have an account. Kindly Signup',
         });
       }
     }
@@ -72,45 +72,45 @@ exports.resetPassword = (req, res, next) => {
       process.env.RESET_PASSWORD_JWT_SECRET
     ).email;
     let updateParams = {
-      TableName: "Users",
+      TableName: 'Users',
       Key: {
         personalEmail: email,
       },
-      UpdateExpression: "set hashPassword = :p",
+      UpdateExpression: 'set hashPassword = :p',
       ExpressionAttributeValues: {
-        ":p": req.body.password,
+        ':p': req.body.password,
       },
-      ReturnValues: "NONE",
+      ReturnValues: 'NONE',
     };
     docClient.update(updateParams, function (err, data) {
       if (err) {
         res.status(200).json({
-          error: "Some error occured",
+          error: 'Some error occured',
         });
       } else {
         res.status(200).json({
-          success: "Password Updated",
+          success: 'Password Updated',
         });
       }
     });
   } catch (err) {
-    next({ status: 400, message: "Get a new OTP and verify your OTP Again" });
+    next({ status: 400, message: 'Get a new OTP and verify your OTP Again' });
   }
 };
 
 exports.mailOtp = async (req, res) => {
   try {
     const response = await axios.post(
-      "https://66ec05ryyl.execute-api.us-east-2.amazonaws.com/getOtpFromEmail",
+      'https://66ec05ryyl.execute-api.us-east-2.amazonaws.com/getOtpFromEmail',
       { email_id: req.body.email }
     );
     if (response.data.statusCode === 200) {
       res.status(200).json({
-        success: "OTP sent",
+        success: 'OTP sent',
       });
     } else {
       res.status(200).json({
-        error: "Error in mailing OTP",
+        error: 'Error in mailing OTP',
       });
     }
   } catch (err) {
@@ -121,7 +121,7 @@ exports.mailOtp = async (req, res) => {
 exports.verifyOtp = (req, res) => {
   try {
     var params = {
-      TableName: "otp",
+      TableName: 'otp',
       Key: {
         email_id: req.body.email,
       },
@@ -129,7 +129,7 @@ exports.verifyOtp = (req, res) => {
     docClient.get(params, function (err, data) {
       if (err) {
         res.status(200).json({
-          error: "Expired or Incorrect OTP",
+          error: 'Expired or Incorrect OTP',
         });
       } else {
         if (data && data.Item && data.Item.otp === req.body.otp) {
@@ -139,7 +139,7 @@ exports.verifyOtp = (req, res) => {
               { email: req.body.email },
               process.env.SIGNUP_JWT_SECRET,
               {
-                expiresIn: "1d",
+                expiresIn: '1d',
               }
             );
           } else {
@@ -147,7 +147,7 @@ exports.verifyOtp = (req, res) => {
               { email: req.body.email },
               process.env.RESET_PASSWORD_JWT_SECRET,
               {
-                expiresIn: "1d",
+                expiresIn: '1d',
               }
             );
           }
@@ -156,7 +156,7 @@ exports.verifyOtp = (req, res) => {
           });
         } else {
           res.status(200).json({
-            error: "Expired or Incorrect OTP",
+            error: 'Expired or Incorrect OTP',
           });
         }
       }
@@ -169,7 +169,7 @@ exports.verifyOtp = (req, res) => {
 exports.loginWithPassword = (req, res) => {
   try {
     let params = {
-      TableName: "Users",
+      TableName: 'Users',
       Key: {
         personalEmail: req.body.email,
       },
@@ -177,11 +177,11 @@ exports.loginWithPassword = (req, res) => {
     docClient.get(params, function (err, data) {
       if (err) {
         res.status(200).json({
-          error: "Some error occured",
+          error: 'Some error occured',
         });
       } else {
         if (data && data.Item) {
-          const hash = "hash"; // will be replaced by function soon
+          const hash = 'hash'; // will be replaced by function soon
           if (
             data.Item.passwordLess === false &&
             data.Item.hashPassword === hash
@@ -190,24 +190,24 @@ exports.loginWithPassword = (req, res) => {
               { email: req.body.email },
               process.env.JWT_SECRET,
               {
-                expiresIn: req.body.remember === true ? "30d" : "1d",
+                expiresIn: req.body.remember === true ? '30d' : '1d',
               }
             );
             let updateParams = {
-              TableName: "Users",
+              TableName: 'Users',
               Key: {
                 personalEmail: req.body.email,
               },
-              UpdateExpression: "set accessToken = :a",
+              UpdateExpression: 'set accessToken = :a',
               ExpressionAttributeValues: {
-                ":a": accessToken,
+                ':a': accessToken,
               },
-              ReturnValues: "ALL_NEW",
+              ReturnValues: 'ALL_NEW',
             };
             docClient.update(updateParams, function (err, data) {
               if (err) {
                 res.status(200).json({
-                  error: "Some error occured",
+                  error: 'Some error occured',
                 });
               } else {
                 res.status(200).json({
@@ -217,12 +217,12 @@ exports.loginWithPassword = (req, res) => {
             });
           } else {
             res.status(200).json({
-              error: "Invalid email/password combination",
+              error: 'Invalid email/password combination',
             });
           }
         } else {
           res.status(200).json({
-            error: "You do not have an account. Kindly Signup",
+            error: 'You do not have an account. Kindly Signup',
           });
         }
       }
@@ -235,10 +235,10 @@ exports.loginWithPassword = (req, res) => {
 exports.isAuthenticated = (req, res, next) => {
   try {
     if (req.headers.authorization) {
-      const accessToken = req.headers.authorization.split(" ")[1];
+      const accessToken = req.headers.authorization.split(' ')[1];
       const email = jwt.verify(accessToken, process.env.JWT_SECRET).email;
       let params = {
-        TableName: "Users",
+        TableName: 'Users',
         Key: {
           personalEmail: email,
         },
@@ -246,19 +246,19 @@ exports.isAuthenticated = (req, res, next) => {
       docClient.get(params, function (err, data) {
         if (err) {
           res.status(200).json({
-            error: "Some error occured",
+            error: 'Some error occured',
           });
         } else {
           if (data && data.Item && data.Item.accessToken === accessToken) {
             req.email = email;
             next();
           } else {
-            res.status(401).json({ error: "Unauthorized" });
+            res.status(401).json({ error: 'Unauthorized' });
           }
         }
       });
     } else {
-      res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({ error: 'Unauthorized' });
     }
   } catch (err) {
     next({ status: 400 });
@@ -268,24 +268,24 @@ exports.isAuthenticated = (req, res, next) => {
 exports.logout = (req, res) => {
   try {
     let updateParams = {
-      TableName: "Users",
+      TableName: 'Users',
       Key: {
         personalEmail: req.email,
       },
-      UpdateExpression: "set accessToken = :a",
+      UpdateExpression: 'set accessToken = :a',
       ExpressionAttributeValues: {
-        ":a": "",
+        ':a': '',
       },
-      ReturnValues: "NONE",
+      ReturnValues: 'NONE',
     };
     docClient.update(updateParams, function (err, data) {
       if (err) {
         res.status(200).json({
-          error: "Some error occured",
+          error: 'Some error occured',
         });
       } else {
         res.status(200).json({
-          success: "Logged Out Successfully",
+          success: 'Logged Out Successfully',
         });
       }
     });
@@ -296,24 +296,24 @@ exports.logout = (req, res) => {
 
 exports.loginWithLinkedIn = async (req, res, next) => {
   try {
-    let auth = "Bearer " + req.body.accessToken;
-    const response = await axios.get("https://api.linkedin.com/v2/me", {
-      method: "GET",
-      headers: { Connection: "Keep-Alive", Authorization: auth },
+    let auth = 'Bearer ' + req.body.accessToken;
+    const response = await axios.get('https://api.linkedin.com/v2/me', {
+      method: 'GET',
+      headers: { Connection: 'Keep-Alive', Authorization: auth },
     });
     const linkeinId = response.data.id;
     let params = {
-      TableName: "Users",
-      IndexName: "linkedin-index",
+      TableName: 'Users',
+      IndexName: 'linkedin-index',
       ExpressionAttributeValues: {
-        ":v1": linkeinId,
+        ':v1': linkeinId,
       },
-      KeyConditionExpression: "linkedin = :v1",
+      KeyConditionExpression: 'linkedin = :v1',
     };
     docClient.query(params, function (err, data) {
       if (err) {
         res.status(200).json({
-          error: "Some error occured",
+          error: 'Some error occured',
         });
       } else {
         if (data && data.Items && data.Items[0]) {
@@ -322,24 +322,24 @@ exports.loginWithLinkedIn = async (req, res, next) => {
             { email: email },
             process.env.JWT_SECRET,
             {
-              expiresIn: req.body.remember === true ? "30d" : "1d",
+              expiresIn: req.body.remember === true ? '30d' : '1d',
             }
           );
           let updateParams = {
-            TableName: "Users",
+            TableName: 'Users',
             Key: {
               personalEmail: email,
             },
-            UpdateExpression: "set accessToken = :a",
+            UpdateExpression: 'set accessToken = :a',
             ExpressionAttributeValues: {
-              ":a": accessToken,
+              ':a': accessToken,
             },
-            ReturnValues: "ALL_NEW",
+            ReturnValues: 'ALL_NEW',
           };
           docClient.update(updateParams, function (err, data) {
             if (err) {
               res.status(200).json({
-                error: "Some error occured",
+                error: 'Some error occured',
               });
             } else {
               res.status(200).json({
@@ -349,70 +349,69 @@ exports.loginWithLinkedIn = async (req, res, next) => {
           });
         } else {
           res.status(200).json({
-            error: "You do not have an account. Kindly Signup",
+            error: 'You do not have an account. Kindly Signup',
           });
         }
       }
     });
   } catch (err) {
-    next({ status: 401});
+    next({ status: 401 });
   }
 };
 
-
 exports.signupNoniniPasswordless = async (req, res, next) => {
-  const expTime = getExpTime()
+  const expTime = getExpTime();
 
   var createParams = {
-    TableName:"Users",
-    Item:{
-        "fullName": userInfo.name,
-        "fullNameInstitute": req.body.fullNameInstitute,
-        "firstName": userInfo.given_name,
-        "lastName": userInfo.family_name,
-        "contact": req.body.contact,
-        "personalEmail": userInfo.email,
-        "instituteEmail": req.body.instituteEmail,
-        "dpProfile": userInfo.picture,
-        "discord": req.body.discord,
-        "facebook": req.body.facebook,
-        "instagram": req.body.instagram,
-        "instituteName": req.body.instituteName,
-        "batch": req.body.batch,
-        "joiningYear": req.body.joiningYear,
-        "expTime": expTime,
-        "linkedin": req.body.linkedinId
-    }
+    TableName: 'Users',
+    Item: {
+      fullName: userInfo.name,
+      fullNameInstitute: req.body.fullNameInstitute,
+      firstName: userInfo.given_name,
+      lastName: userInfo.family_name,
+      contact: req.body.contact,
+      personalEmail: userInfo.email,
+      instituteEmail: req.body.instituteEmail,
+      dpProfile: userInfo.picture,
+      discord: req.body.discord,
+      facebook: req.body.facebook,
+      instagram: req.body.instagram,
+      instituteName: req.body.instituteName,
+      batch: req.body.batch,
+      joiningYear: req.body.joiningYear,
+      expTime: expTime,
+      linkedin: req.body.linkedinId,
+    },
   };
-  
-  docClient.put(createParams, function(err, data) {
-    if (err) {
-        res.status(500).json({
-          error: "Unable to add item",
-        });                
-    } else {
-        res.status(200).json({
-          success: "Item added successfully",
-        });
-    }
-  });  
 
+  docClient.put(createParams, function (err, data) {
+    if (err) {
+      res.status(500).json({
+        error: 'Unable to add item',
+      });
+    } else {
+      res.status(200).json({
+        success: 'Item added successfully',
+      });
+    }
+  });
 };
 
 // It will give name, ProfileURL, email address of the user signed by google.
 async function getUserInfo(accessToken) {
-  
-  let auth = "Bearer " + accessToken;
-  const response = await axios.get("https://www.googleapis.com/oauth2/v1/userinfo", {
-    method: "GET",
-    headers: { Connection: "Keep-Alive", Authorization: auth },
-  });
-  
-  return response.data
+  let auth = 'Bearer ' + accessToken;
+  const response = await axios.get(
+    'https://www.googleapis.com/oauth2/v1/userinfo',
+    {
+      method: 'GET',
+      headers: { Connection: 'Keep-Alive', Authorization: auth },
+    }
+  );
+
+  return response.data;
 }
 
 function getExpTime() {
-  
   var datetime = new Date();
   var date = datetime.getDate();
   // 0-index based month is returned
@@ -420,81 +419,85 @@ function getExpTime() {
   var year = datetime.getFullYear();
   date = date + parseInt(process.env.EXPIRATION_TIME);
   var daysInMonth = new Date(year, month, 0).getDate();
-  if(date>daysInMonth)
-  {
-    date-=daysInMonth;
+  if (date > daysInMonth) {
+    date -= daysInMonth;
     month++;
   }
-  if(month>12)
-  {
+  if (month > 12) {
     month = 1;
     year++;
   }
-  return (((date < 10)?"0":"") + date +"/"+(((month) < 10)?"0":"") + (month) +"/"+ year);
-} 
+  return (
+    (date < 10 ? '0' : '') +
+    date +
+    '/' +
+    (month < 10 ? '0' : '') +
+    month +
+    '/' +
+    year
+  );
+}
 
 // It checks whether there is a user with same linkedin-id or not
-exports.linkedinInfo = async (req,res,next) => {
-  let auth = "Bearer " + req.body.linkedinAccessToken;
-  const response = await axios.get("https://api.linkedin.com/v2/me", {
-    method: "GET",
-    headers: { Connection: "Keep-Alive", Authorization: auth },
+exports.linkedinInfo = async (req, res, next) => {
+  let auth = 'Bearer ' + req.body.linkedinAccessToken;
+  const response = await axios.get('https://api.linkedin.com/v2/me', {
+    method: 'GET',
+    headers: { Connection: 'Keep-Alive', Authorization: auth },
   });
   let params = {
-    TableName: "Users",
-    IndexName: "linkedin-index",
+    TableName: 'Users',
+    IndexName: 'linkedin-index',
     ExpressionAttributeValues: {
-      ":v1": response.data.id,
+      ':v1': response.data.id,
     },
-    KeyConditionExpression: "linkedin = :v1",
+    KeyConditionExpression: 'linkedin = :v1',
   };
-try{
-  docClient.query(params, function (err, data) {
+  try {
+    docClient.query(params, function (err, data) {
       if (data && data.Items && data.Items[0]) {
         res.status(200).json({
-          error: "You have an linkedin account with different personal email ID",
+          error:
+            'You have an linkedin account with different personal email ID',
         });
-      }else{
-        req.body.linkedinId = response.data.id
+      } else {
+        req.body.linkedinId = response.data.id;
         next();
       }
-  });  
-  }catch(err){
+    });
+  } catch (err) {
     res.status(200).json({
-      error: err
+      error: err,
     });
   }
+};
 
-} 
-
-exports.getEmail = async (req,res,next) => {
+exports.getEmail = async (req, res, next) => {
   try {
-    
     const tokenResponse = await axios.post(
-      "https://www.googleapis.com/oauth2/v4/token",
-      { 
+      'https://www.googleapis.com/oauth2/v4/token',
+      {
         client_id: process.env.GOOGLE_CLIENT_ID,
-        client_secret:process.env.GOOGLE_CLIENT_SECRET,
-        refresh_token:req.body.googleRefreshToken,
-        grant_type: "refresh_token"
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        refresh_token: req.body.googleRefreshToken,
+        grant_type: 'refresh_token',
       }
     );
-    const userInfo = await getUserInfo(tokenResponse.data.access_token)
+    const userInfo = await getUserInfo(tokenResponse.data.access_token);
     req.body.personalEmail = userInfo.email;
     // console.log(userInfo.email);
     next();
   } catch (err) {
     res.status(200).json({
-      error: err
+      error: err,
     });
   }
-} 
+};
 
-exports.checkUser = async (req,res,next) => {
+exports.checkUser = async (req, res, next) => {
   try {
-    
     let params = {
-      TableName: "Users",
+      TableName: 'Users',
       Key: {
         personalEmail: req.body.personalEmail,
       },
@@ -502,23 +505,21 @@ exports.checkUser = async (req,res,next) => {
     docClient.get(params, function (err, data) {
       if (err) {
         res.status(200).json({
-          error: "Some error occured",
+          error: 'Some error occured',
         });
       } else {
         if (data && data.Item) {
           res.status(200).json({
-            error: "You already have an account. Kindly Login",
+            error: 'You already have an account. Kindly Login',
           });
-        }
-        else{
+        } else {
           next();
-        } 
+        }
       }
     });
   } catch (err) {
     res.status(200).json({
-      error: err
+      error: err,
     });
-  } 
-} 
-
+  }
+};

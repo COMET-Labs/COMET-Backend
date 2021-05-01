@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 const {
   mailOtp,
@@ -14,7 +14,7 @@ const {
   linkedinInfo,
   getEmail,
   checkUser,
-} = require("../controllers/auth");
+} = require('../controllers/auth');
 const {
   validateMailRequest,
   validateOtpRequest,
@@ -23,10 +23,10 @@ const {
   validateLoginWithLinkedIn,
   validateResetPasswordRequest,
   validateSignupNoniniPasswordless,
-} = require("../validators/auth");
-const { handleError } = require("../middlewares/index");
+} = require('../validators/auth');
+const { handleError } = require('../middlewares/index');
 router.post(
-  "/signup/mailotp",
+  '/signup/mailotp',
   validateMailRequest,
   isRequestValidated,
   isNewUser,
@@ -35,7 +35,7 @@ router.post(
 );
 
 router.post(
-  "/forgotpassword/mailotp",
+  '/forgotpassword/mailotp',
   validateMailRequest,
   isRequestValidated,
   isUserWithPassword,
@@ -44,7 +44,7 @@ router.post(
 );
 
 router.post(
-  "/verifyotp",
+  '/verifyotp',
   validateOtpRequest,
   isRequestValidated,
   verifyOtp,
@@ -52,17 +52,17 @@ router.post(
 );
 
 router.post(
-  "/loginwithpassword",
+  '/loginwithpassword',
   validateLoginWithPassword,
   isRequestValidated,
   loginWithPassword,
   handleError
 );
 
-router.post("/logout", isAuthenticated, logout, handleError);
+router.post('/logout', isAuthenticated, logout, handleError);
 
 router.post(
-  "/loginwithlinkedin",
+  '/loginwithlinkedin',
   validateLoginWithLinkedIn,
   isRequestValidated,
   loginWithLinkedIn,
@@ -70,7 +70,7 @@ router.post(
 );
 
 router.post(
-  "/resetpassword",
+  '/resetpassword',
   validateResetPasswordRequest,
   isRequestValidated,
   resetPassword,
@@ -78,7 +78,7 @@ router.post(
 );
 
 router.post(
-  "/signup/nonini/passwordless",
+  '/signup/nonini/passwordless',
   validateSignupNoniniPasswordless,
   isRequestValidated,
   getEmail,
