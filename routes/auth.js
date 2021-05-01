@@ -12,6 +12,7 @@ const {
   resetPassword,
   signupNoniniPasswordless,
   signupiniPasswordless,
+  signupnoniniPassword,
   linkedinInfo,
   getEmail,
   checkUser,
@@ -24,6 +25,7 @@ const {
   validateLoginWithLinkedIn,
   validateResetPasswordRequest,
   validateSignupNoniniPasswordless,
+  validateSignupNoniniPassword,
 } = require('../validators/auth');
 const { handleError } = require('../middlewares/index');
 router.post(
@@ -98,6 +100,16 @@ router.post(
   checkUser,
   linkedinInfo,
   signupiniPasswordless,
+  handleError
+);
+
+router.post(
+  '/signup/nonini/password',
+  validateSignupNoniniPassword,
+  isRequestValidated,
+  checkUser,
+  linkedinInfo,
+  signupnoniniPassword,
   handleError
 );
 
