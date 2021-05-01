@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const clubSchema = mongoose.Schema(
   {
@@ -18,22 +18,22 @@ const clubSchema = mongoose.Schema(
     mentors: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
       },
     ],
     moderators: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
       },
     ],
     banned: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
       },
     ],
   },
   { timestamps: true }
 );
-module.exports = mongoose.model("Club", clubSchema);
+module.exports = mongoose.model('Club', clubSchema);

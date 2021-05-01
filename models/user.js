@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const userSchema = mongoose.Schema(
   {
@@ -74,7 +74,7 @@ const userSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-userSchema.virtual("password").set(function (password) {
+userSchema.virtual('password').set(function (password) {
   this.hash_password = bcrypt.hashSync(password, 10);
 });
 
@@ -84,4 +84,4 @@ userSchema.methods = {
   },
 };
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model('User', userSchema);
