@@ -1,5 +1,5 @@
-const Usercontact = require("../models/userContacts");
-const club = require("../models/club");
+const Usercontact = require('../models/userContacts');
+const club = require('../models/club');
 
 exports.myClubs = (req, res) => {
   Usercontact.findOne({
@@ -29,7 +29,7 @@ exports.addMyClub = (req, res) => {
         clubDetails.banned.forEach(function (entry) {
           if (entry.toString() === userId) {
             isfound = true;
-            return res.json({ message: "You have been banned from club :(" });
+            return res.json({ message: 'You have been banned from club :(' });
           }
         });
         if (!isfound)
@@ -44,11 +44,11 @@ exports.addMyClub = (req, res) => {
             }
           )
             .exec()
-            .then((response) => res.json(response))
-            .catch((error) => res.json(error));
+            .then(response => res.json(response))
+            .catch(error => res.json(error));
       }
     })
-    .catch((error) => res.json("Something Went Wrong"));
+    .catch(error => res.json('Something Went Wrong'));
 };
 
 exports.deleteMyClub = (req, res) => {
@@ -64,8 +64,8 @@ exports.deleteMyClub = (req, res) => {
     }
   )
     .exec()
-    .then((response) => res.json(response))
-    .catch((error) => res.json(error));
+    .then(response => res.json(response))
+    .catch(error => res.json(error));
 };
 
 exports.banUser = (req, res) => {
@@ -99,8 +99,8 @@ exports.banUser = (req, res) => {
               }
             )
               .exec()
-              .then((response) => res.json(response))
-              .catch((error) => res.json(error));
+              .then(response => res.json(response))
+              .catch(error => res.json(error));
           }
         });
         clubDetails.moderators.forEach(function (entry) {
@@ -127,13 +127,13 @@ exports.banUser = (req, res) => {
               }
             )
               .exec()
-              .then((response) => res.json(response))
-              .catch((error) => res.json(error));
+              .then(response => res.json(response))
+              .catch(error => res.json(error));
           }
         });
         if (!isfound)
           return res.json({ message: "You Don't Have Permission :)" });
       }
     })
-    .catch((error) => res.json("Something Went Wrong"));
+    .catch(error => res.json('Something Went Wrong'));
 };

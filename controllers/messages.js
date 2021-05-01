@@ -1,16 +1,16 @@
-const Message = require("../models/message");
-const Comment = require("../models/comment");
-const Club = require("../models/club");
+const Message = require('../models/message');
+const Comment = require('../models/comment');
+const Club = require('../models/club');
 
 // For Fetching Past Messages
 exports.past_message = (req, res) => {
   Message.find({ recieverClub: req.body.clubId })
     .sort({ createdAt: -1 })
-    .then((user) => {
+    .then(user => {
       return res.status(200).json(user);
     })
-    .catch((err) => {
-      return res.status(400).json({ error: "Something went wrong" });
+    .catch(err => {
+      return res.status(400).json({ error: 'Something went wrong' });
     });
 };
 
@@ -29,12 +29,12 @@ exports.new_message = (req, res) => {
   _message.save((error, data) => {
     if (error) {
       console.log(error);
-      return res.status(400).json({ error: "Something went wrong" });
+      return res.status(400).json({ error: 'Something went wrong' });
     }
 
     if (data) {
       return res.status(200).json({
-        message: "Sent",
+        message: 'Sent',
       });
     }
   });
@@ -49,10 +49,10 @@ exports.delete_message = (req, res) => {
       if (message.senderId.toString() === senderId) {
         Comment.deleteMany({ _id: { $in: message.comments } }).exec(
           (error, data) => {
-            if (error) return res.json({ message: "Something Went Wrong !" });
+            if (error) return res.json({ message: 'Something Went Wrong !' });
             Message.deleteOne({ _id: messageId }).exec((error, data) => {
-              if (error) return res.json({ message: "Something Went Wrong !" });
-              return res.json({ message: "You Deleted the Message" });
+              if (error) return res.json({ message: 'Something Went Wrong !' });
+              return res.json({ message: 'You Deleted the Message' });
             });
           }
         );
@@ -67,15 +67,15 @@ exports.delete_message = (req, res) => {
                   Comment.deleteMany({ _id: { $in: message.comments } }).exec(
                     (error, data) => {
                       if (error)
-                        return res.json({ message: "Something Went Wrong !" });
+                        return res.json({ message: 'Something Went Wrong !' });
                       Message.deleteOne({ _id: messageId }).exec(
                         (error, data) => {
                           if (error)
                             return res.json({
-                              message: "Something Went Wrong !",
+                              message: 'Something Went Wrong !',
                             });
                           return res.json({
-                            message: "You Deleted the Message",
+                            message: 'You Deleted the Message',
                           });
                         }
                       );
@@ -89,15 +89,15 @@ exports.delete_message = (req, res) => {
                   Comment.deleteMany({ _id: { $in: message.comments } }).exec(
                     (error, data) => {
                       if (error)
-                        return res.json({ message: "Something Went Wrong !" });
+                        return res.json({ message: 'Something Went Wrong !' });
                       Message.deleteOne({ _id: messageId }).exec(
                         (error, data) => {
                           if (error)
                             return res.json({
-                              message: "Something Went Wrong !",
+                              message: 'Something Went Wrong !',
                             });
                           return res.json({
-                            message: "You Deleted the Message",
+                            message: 'You Deleted the Message',
                           });
                         }
                       );
@@ -113,7 +113,7 @@ exports.delete_message = (req, res) => {
       } else {
         return res.json({ message: "You Don't Have Permission :)" });
       }
-    } else return res.status(400).json({ message: "Something went Wrong" });
+    } else return res.status(400).json({ message: 'Something went Wrong' });
   });
 };
 
@@ -131,8 +131,8 @@ exports.insertStar = (req, res) => {
     }
   )
     .exec()
-    .then((response) => res.json(response))
-    .catch((error) => res.json(error));
+    .then(response => res.json(response))
+    .catch(error => res.json(error));
 };
 
 exports.deleteStar = (req, res) => {
@@ -148,6 +148,6 @@ exports.deleteStar = (req, res) => {
     }
   )
     .exec()
-    .then((response) => res.json(response))
-    .catch((error) => res.json(error));
+    .then(response => res.json(response))
+    .catch(error => res.json(error));
 };

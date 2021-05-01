@@ -3,12 +3,13 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "nodemon ./bin/www",
+    "format": "prettier --write '*/**.{js,jsx,css,html}'"
   },
   "dependencies": {
     "aws-sdk": "^2.876.0",
     "axios": "^0.21.1",
-    "bcrypt": "^5.0.0",
+    "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
@@ -24,5 +25,8 @@
     "morgan": "~1.9.1",
     "nodemon": "^2.0.6",
     "socket.io": "^3.0.4"
+  },
+  "devDependencies": {
+    "prettier": "^2.2.1"
   }
 }
